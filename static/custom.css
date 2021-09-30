@@ -1,0 +1,48 @@
+.white {
+	color: #fcfefe;
+}
+.black {
+	color: #040404;
+}
+.grey{
+	color: #86858B;
+}
+.blue {
+	color: #2A99FD;
+}
+.bgwhite{
+	background-color: white;
+}
+.bgblue{
+	background-color: #2E8DFB;
+}
+.bggrey{
+	background-color: #eee;
+}
+body{
+	background-color: #fafafa;
+}
+input,.input{
+	outline: none;
+	border: none;
+}
+.h44{
+	height: 88upx;
+	line-height: 88upx;
+}
+.radius22{
+	border-radius: 44upx;
+}
+.mtb20{
+	margin-top: 40upx;
+	margin-bottom: 40upx;
+}
+.grey-container{
+	background-color: #eee;
+	height: 58upx;
+	line-height: 58upx;
+	border-radius: 29upx;
+}
+.red{
+	color: #FD5550;
+}

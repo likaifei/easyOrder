@@ -1,0 +1,63 @@
+{
+	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+		{
+			"path": "main/order",
+			"style": {
+				"navigationBarTitleText": "开单"
+			}
+		},
+		{
+			"path": "pages/client",
+			"style": {
+				"navigationBarTitleText": "客户"
+			}
+		},
+		{
+			"path": "main/list",
+			"style": {
+				"navigationBarTitleText": "订单"
+			}
+		},
+		{
+			"path": "main/setting",
+			"style": {
+				"navigationBarTitleText": "设置"
+			}
+		},
+		{
+			"path": "pages/goods",
+			"style": {
+				"navigationBarTitleText": "选商品"
+			}
+		}
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "易销货",
+		"navigationBarBackgroundColor": "#F8F8F8",
+		"backgroundColor": "#F8F8F8"
+	},
+	"tabBar": {
+		"color": "#040404",
+		"selectedColor": "#2A99FD",
+		"list": [{
+				"pagePath": "main/order",
+				"iconPath": "static/image/new/order_normal.png",
+				"selectedIconPath": "static/image/new/order_press.png",
+				"text": "开单"
+			},
+			{
+				"pagePath": "main/list",
+				"iconPath": "static/image/jcico/ic_report_normal.png",
+				"selectedIconPath": "static/image/jcico/ic_report_press.png",
+				"text": "订单"
+			},
+			{
+				"pagePath": "main/setting",
+				"iconPath": "static/image/new/app_normal.png",
+				"selectedIconPath": "static/image/new/app_press.png",
+				"text": "设置"
+			}
+		]
+	}
+}
