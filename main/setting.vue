@@ -1,17 +1,20 @@
 <template lang="pug">
 	.p15
-		.flex.between
+		.item(@tap="update") 更新
+		.item(@tap="backup") 备份
+		picker(@change="doRecover" :range="recoverList")
+			.item 恢复
+		.flex.between.mt20
 			view(@tap="scan" v-if="!scanning") 搜索蓝牙
 			view(v-else @tap="stopScan") 停止搜索
 			view(v-if="connected" @tap="disconnect") 断开
 		.flex.between.p15(v-for="item in devices" :key="item.deviceId" @tap="connect(item)" :class="item.deviceId==deviceId?'blue':''")
 			view {{item.deviceId}}
 			view {{item.name || item.localName}}
-		view(@tap="test") 打印
 </template>
 
 <script>
-	import {toast, db} from '@/js/utils'
+	import {toast, db, update} from '@/js/utils'
 	import bl from '@/js/bluetooth.js'
 	import str2hex from '@/js/str2hex'
 	
@@ -22,10 +25,12 @@
 				connected: false,
 				deviceId: '',
 				scanning: false,
-				lastPrinter: ''
+				lastPrinter: '',
+				recoverList: []
 			}
 		},
 		onLoad(){
+			this.refreshRecoverList()
 			uni.$on('print', this.print)
 			this.lastPrinter = db.get('lastPrinter')
 			bl.open()
@@ -33,6 +38,27 @@
 			this.scan()
 		},
 		methods: {
+			update(){
+				var osname=plus.os.name;
+				plus.runtime.getProperty(plus.runtime.appid, function(widgetInfo) {
+					console.log(widgetInfo.version,'-------------', osname);
+					update({hot:{url: 'http://easy.vccgnd.top/update/' + widgetInfo.version + '.wgt'}})
+				});
+			},
+			backup(){
+				this.api('backup').then(() => {
+					toast('备份成功')
+					this.refreshRecoverList()
+				})
+			},
+			refreshRecoverList(){
+				this.api('getBackups').then(data=>{
+					this.recoverList = data
+				})
+			},
+			doRecover(event){
+				this.api('recover', this.recoverList[event.detail.value])
+			},
 			onScan(devices){
 				this.devices = this.devices.concat(devices.devices)
 				let oldDeviceId = this.lastPrinter
@@ -56,32 +82,26 @@
 				bl.stopScan()
 				this.scanning = false
 			},
-			test(){
-				this.print({
-					goods: [
-						{name: '盘子', number: 5, price: '5.50', money: '27.50'}
-					]
-				})
-			},
 			print(data){
-				let maxLen = 25 // 比如这张纸最多放50个字符
+				let maxLen = 25 // 比如这张纸最多放25个字符
+				function getLen(text){
+					let map = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,+*!"\'0123456789$'
+					let result = 0
+					for(let i = 0; i < text.length; i++){
+						if(map.indexOf(text.substr(i, 1)) == -1){
+							result += 2
+						}else{
+							result += 1
+						}
+					}
+					return result
+				}
 				function calcSpace(text1, text2, len){
 					text1 = text1.toString()
 					text2 = text2.toString()
 					if(!len)
 						len = maxLen
-					let map = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,+*!"\'0123456789$'
-					function getLen(text){
-						let result = 0
-						for(let i = 0; i < text.length; i++){
-							if(map.indexOf(text.substr(i, 1)) == -1){
-								result += 2
-							}else{
-								result += 1
-							}
-						}
-						return result
-					}
+					
 					let len1 = getLen(text1)
 					let len2 = getLen(text2)
 					console.log(len, len1, len2)
@@ -93,25 +113,38 @@
 				let ESC = String.fromCharCode(27)
 				let C1 = String.fromCharCode(0x1c)
 				let ch12 = String.fromCharCode(12)
+				let line = '______________________________________\n'
 				//ESC! 是调字号  0的编码是48位最大 还可以是0,16,32,48
-				let str = ESC+'@'+C1+'!'+ch12+'     大寨欢迎你\n______________________________________\n'+C1+'!' + String.fromCharCode(0)
+				let str = ESC+'@'+C1+'!'+ch12+'    纸扎用品大全'+C1+'!' + String.fromCharCode(0) + '\n'
+				str += line
+				str += '   名称        单价  个数  总价\n'
+				let total = 0
 				for(let goods of data.goods){
-					let space1 = '' 
-					let len1 = calcSpace(goods.name, goods.number) - 1
-					for(let i = 0; i < len1; i++){
-						space1 += ' '
-					}
-					let space2 = ''
-					let len2 = calcSpace(goods.price, goods.money) - 2
-					console.log(len1, len2)
-					for(let i = 0; i < len2; i++){
-						space2 += ' '
-					}
-					str += `   ${goods.name}${space1}x${goods.number}\n   $${goods.price}${space2}$${goods.money}\n`
+					let {number, name, price, money} = goods
+					price = Number(price).toFixed(1).replace('.0', '')
+					money = Number(money).toFixed(1).replace('.0', '')
+					
+					let len1 = Math.max(12 - getLen(name), 2)
+					let len2 = Math.max(6 - getLen(price), 2)
+					let len3 = Math.max(6 - getLen(number), 2)
+					let space1 = new Array(len1).fill(' ').join('')
+					let space2 = new Array(len2).fill(' ').join('')
+					let space3 = new Array(len3).fill(' ').join('')
+					
+					str += `   ${name}${space1}${price}${space2}${number}${space3}${money}\n`
+					total += Number(goods.money)
 				}
-				str += "\n\n\n\n"
+				total = total.toFixed(2)
+				let len4 = calcSpace('合计:元', total)
+				let space4 = new Array(len4).fill(' ').join('')
+				str += line
+				str += `   ${space4}合计: ${total} 元\n`
+				str += '   免开尊口 本店概不赊账\n'
+				str += '             二十四小时服务热线\n'
+				str += '                    15236570288\n'
+				str += '                    17123022333\n'
+				str += '\n\n\n\n'
 				let hex = str2hex(str)
-				console.log(hex)
 				bl.send(this.deviceId, hex)
 				toast('打印指令发送完成')
 			},
@@ -136,5 +169,10 @@
 	}
 </script>
 
-<style>
+<style scoped>
+	.item{
+		line-height: 80upx;
+		height: 80upx;
+		border-bottom: 1px solid #ccc;
+	}
 </style>

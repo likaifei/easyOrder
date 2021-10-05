@@ -1,5 +1,3 @@
-import host from './host'
-
 export const toast = function(text) {
 	uni.showToast({
 		title: text,
@@ -134,35 +132,6 @@ export const update = function(data, showInfo) {
 		uni.hideLoading()
 		if(showInfo)toast('该版本为最新版本');
 	}
-}
-
-export const checkUpdate = function(showInfo) {
-	let device = db.get('device')
-	let version = db.get('version')
-	uni.request({
-		url: host.host + host.apiPrefix + 'checkUpdate',
-		method: 'POST',
-		data: JSON.stringify({
-			device,
-			version
-		}),
-		header: {
-			'content-type': 'application/json'
-		},
-		success: res => {
-			var resdata = res.data;
-			if (resdata.state == 1) {
-				setTimeout(()=>{
-					update(resdata.data, showInfo)
-				}, 1500)
-			} else {
-				toast(resdata.msg);
-			}
-		},
-		fail: (err) => {
-			toast('检查更新失败')
-		}
-	});
 }
 
 export const getListSum = function(list, key){

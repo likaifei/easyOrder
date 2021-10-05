@@ -20,7 +20,7 @@
 
 <script>
 	import uniPopup from '@/components/uni-popup/uni-popup.vue'
-	import {copy} from '@/js/utils'
+	import {copy, toast} from '@/js/utils'
 	export default {
 		components: {uniPopup},
 		data(){
@@ -37,6 +37,7 @@
 				this.$refs.popup.close()
 			},
 			save(){
+				if(this.item.clientName == '') return toast('客户名不能为空')
 				let method = this.item.id?'updateClient':'addClient'
 				this.api(method, this.item)
 				this.close()
