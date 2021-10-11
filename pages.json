@@ -25,6 +25,12 @@
 			}
 		},
 		{
+			"path": "pages/setting",
+			"style": {
+				"navigationBarTitleText": "其他设置"
+			}
+		},
+		{
 			"path": "pages/goods",
 			"style": {
 				"navigationBarTitleText": "选商品"

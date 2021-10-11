@@ -1,4 +1,7 @@
 import {db, toast} from './utils'
+const CryptoJS = require('crypto-js')
+const iv = CryptoJS.enc.Hex.parse('DEAD1151DEAD')
+const aesOption = {iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7}
 function request(url, data = null, showLoading = false){
 	let method = (data)? 'POST': 'GET'
 	let host = 'http://easy.vccgnd.top'
@@ -109,7 +112,8 @@ class methods {
 	getOrders(){
 		return this.baseGetList('orders')
 	}
-	backup(){
+	backup({pass, uuid}){
+		pass = CryptoJS.enc.Utf8.parse(pass.padStart(8, '0'))
 		let priceBookMap = this.getPriceBookMap()
 		let priceBooks = {}
 		for(let id in priceBookMap){
@@ -122,15 +126,26 @@ class methods {
 			priceBookMap,
 			priceBooks
 		}
-		return request('e.php', data)
+		data = JSON.stringify(data)
+		let encryptoData = CryptoJS.AES.encrypt(data, pass, aesOption)
+		return request('e.php?uuid='+uuid, encryptoData.ciphertext.toString(CryptoJS.enc.Base64))
 	}
-	getBackups(){
-		return request('g.php')
+	getBackups({uuid}){
+		return request('g.php?uuid='+uuid)
 	}
-	recover(url){
+	recover({pass, url, uuid}){
+		pass = CryptoJS.enc.Utf8.parse(pass.padStart(8, '0'))
 		console.log(url)
-		request('backup/'+url).then(data=>{
-			console.log(data)
+		request('backup/'+uuid+'/'+url).then(data=>{
+			data = CryptoJS.AES.decrypt(data, pass, aesOption)
+			try{
+				data = CryptoJS.enc.Utf8.stringify(data)
+				if(data == '') return toast('密码错误')
+				data = JSON.parse(data)
+			}catch(e){
+				console.log(e.toString())
+				return toast('密码错误')
+			}
 			this.baseSave('orders', data.orders)
 			this.baseSave('goods', data.goods)
 			this.baseSave('clients', data.clients)

@@ -1,9 +1,6 @@
 <template lang="pug">
 	.p15
-		.item(@tap="update") 更新
-		.item(@tap="backup") 备份
-		picker(@change="doRecover" :range="recoverList")
-			.item 恢复
+		.item(@tap="go('/pages/setting')") 其他设置
 		.flex.between.mt20
 			view(@tap="scan" v-if="!scanning") 搜索蓝牙
 			view(v-else @tap="stopScan") 停止搜索
@@ -30,7 +27,6 @@
 			}
 		},
 		onLoad(){
-			this.refreshRecoverList()
 			uni.$on('print', this.print)
 			this.lastPrinter = db.get('lastPrinter')
 			bl.open()
@@ -38,27 +34,6 @@
 			this.scan()
 		},
 		methods: {
-			update(){
-				var osname=plus.os.name;
-				plus.runtime.getProperty(plus.runtime.appid, function(widgetInfo) {
-					console.log(widgetInfo.version,'-------------', osname);
-					update({hot:{url: 'http://easy.vccgnd.top/update/' + widgetInfo.version + '.wgt'}})
-				});
-			},
-			backup(){
-				this.api('backup').then(() => {
-					toast('备份成功')
-					this.refreshRecoverList()
-				})
-			},
-			refreshRecoverList(){
-				this.api('getBackups').then(data=>{
-					this.recoverList = data
-				})
-			},
-			doRecover(event){
-				this.api('recover', this.recoverList[event.detail.value])
-			},
 			onScan(devices){
 				this.devices = this.devices.concat(devices.devices)
 				let oldDeviceId = this.lastPrinter
