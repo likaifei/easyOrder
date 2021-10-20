@@ -116,7 +116,7 @@ class methods {
 		pass = CryptoJS.enc.Utf8.parse(pass.padStart(8, '0'))
 		let priceBookMap = this.getPriceBookMap()
 		let priceBooks = {}
-		for(let id in priceBookMap){
+		for(let id of priceBookMap){
 			priceBooks[id] = this.getPriceBook({id})
 		}
 		let data = {

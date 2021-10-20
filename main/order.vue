@@ -154,6 +154,9 @@
 		background: #fff;
 		position: fixed;
 		bottom: 0;
+		/*#ifdef H5*/
+		bottom: 100upx;
+		/*#endif*/
 		width: 100vw;
 		left: 0;
 		height: 100upx;
