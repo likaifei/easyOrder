@@ -3,8 +3,8 @@
 		confirm(ref="confirm")
 		.item uuid: {{uuid}}
 		.item(@tap="update") 更新
-		.item(@tap="backup") 备份
-		picker(@change="doRecover" :range="recoverList")
+		//.item(@tap="backup") 备份
+		//picker(@change="doRecover" :range="recoverList")
 			.item 恢复
 </template>
 
@@ -44,24 +44,24 @@
 			backup(){
 				this.$refs.confirm.open('请输入密码', '', this.doBackup)
 			},
-			doBackup(pass){
-				this.api('backup', {pass, uuid: this.uuid}).then(() => {
+			async doBackup(pass){
+				await this.api('backup', {pass, uuid: this.uuid}).then(() => {
 					toast('备份成功')
 					this.refreshRecoverList()
 				})
 			},
-			refreshRecoverList(){
-				this.api('getBackups', {uuid: this.uuid}).then(data=>{
+			async refreshRecoverList(){
+				await this.api('getBackups', {uuid: this.uuid}).then(data=>{
 					this.recoverList = data
 				})
 			},
-			doRecover(event){
+			async doRecover(event){
 				this.url = this.recoverList[event.detail.value]
 				if(!this.url) return;
 				this.$refs.confirm.open('请输入密码', '', this.doRecover1)
 			},
-			doRecover1(pass){
-				this.api('recover', {pass: pass, url: this.url, uuid: this.uuid})
+			async doRecover1(pass){
+				await this.api('recover', {pass: pass, url: this.url, uuid: this.uuid})
 			}
 		}
 	}

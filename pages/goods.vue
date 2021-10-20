@@ -83,8 +83,8 @@
 			}
 		},
 		methods: {
-			refreshList(){
-				this.goods = this.api('getGoods')
+			async refreshList(){
+				this.goods = await this.api('getGoods')
 				this.groups = Array.from(new Set(this.goods.map(i=>i.group))).filter(i=>i!='')
 				this.groups.push('未分类')
 				this.groups.push('仅选中')

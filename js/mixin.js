@@ -1,5 +1,5 @@
 import {page} from '@/js/utils'
-import api from './api'
+import api from './apiOnline'
 
 export default {
 	methods: {

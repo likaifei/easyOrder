@@ -41,23 +41,23 @@ function nextId(){
 	return nextId
 }
 class methods {
-	baseGetList(key){
+	async baseGetList(key){
 		return db.get(key, [])
 	}
-	baseSave(key, clients){
+	async baseSave(key, clients){
 		db.set(key, clients)
 	}
-	getClients(){
+	async getClients(){
 		return this.baseGetList('clients')
 	}
-	baseAddList(key, data){
+	async baseAddList(key, data){
 		data.id = nextId()
 		let list = this.baseGetList(key)
 		list.push(data)
 		this.baseSave(key, list)
 		return list
 	}
-	baseUpdate(key, data){
+	async baseUpdate(key, data){
 		let list = this.baseGetList(key)
 		let found = list.filter(i => i.id == data.id)
 		if(found.length==0) return toast('更新失败')
@@ -65,28 +65,28 @@ class methods {
 		list[index] = data
 		this.baseSave(key, list)
 	}
-	addClient(data){
-		this.baseAddList('clients', data)
+	async addClient(data){
+		return await this.baseAddList('clients', data)
 	}
-	updateClient(data){
-		this.baseUpdate('clients', data)
+	async updateClient(data){
+		return await this.baseUpdate('clients', data)
 	}
-	getGoods(){
-		return this.baseGetList('goods')
+	async getGoods(){
+		return await  this.baseGetList('goods')
 	}
-	addGoods(data){
-		this.baseAddList('goods', data)
+	async addGoods(data){
+		return await this.baseAddList('goods', data)
 	}
-	updateGoods(data){
-		this.baseUpdate('goods', data)
+	async updateGoods(data){
+		return await this.baseUpdate('goods', data)
 	}
-	getPriceBook(client){
-		return db.get('priceBook' + client.id, {})
+	async getPriceBook(client){
+		return await  db.get('priceBook' + client.id, {})
 	}
-	getPriceBookMap(){
-		return db.get('priceBookMap', [])
+	async getPriceBookMap(){
+		return await  db.get('priceBookMap', [])
 	}
-	saveOrder(order){
+	async saveOrder(order){
 		let priceBook = this.getPriceBook(order.client)
 		for(let item of order.goods){
 			priceBook[item.id] = item.price
@@ -109,13 +109,14 @@ class methods {
 			this.baseSave('orders', list)
 		}
 	}
-	getOrders(){
-		return this.baseGetList('orders')
+	async getOrders(){
+		return await this.baseGetList('orders')
 	}
-	backup({pass, uuid}){
+	async backup({pass, uuid}){
 		pass = CryptoJS.enc.Utf8.parse(pass.padStart(8, '0'))
 		let priceBookMap = this.getPriceBookMap()
 		let priceBooks = {}
+		let nextId = db.get('nextId', 1)
 		for(let id of priceBookMap){
 			priceBooks[id] = this.getPriceBook({id})
 		}
@@ -124,16 +125,17 @@ class methods {
 			orders: this.getOrders(),
 			clients: this.getClients(),
 			priceBookMap,
-			priceBooks
+			priceBooks,
+			nextId
 		}
 		data = JSON.stringify(data)
 		let encryptoData = CryptoJS.AES.encrypt(data, pass, aesOption)
 		return request('e.php?uuid='+uuid, encryptoData.ciphertext.toString(CryptoJS.enc.Base64))
 	}
-	getBackups({uuid}){
+	async getBackups({uuid}){
 		return request('g.php?uuid='+uuid)
 	}
-	recover({pass, url, uuid}){
+	async recover({pass, url, uuid}){
 		pass = CryptoJS.enc.Utf8.parse(pass.padStart(8, '0'))
 		console.log(url)
 		request('backup/'+uuid+'/'+url).then(data=>{
@@ -153,10 +155,16 @@ class methods {
 			for(let id in data.priceBooks){
 				this.baseSave('priceBook' + id, data.priceBooks[id])
 			}
+			db.set('nextId', data.nextId)
 			toast('恢复成功')
+			// let ids = []
+			// ids = ids.concat(data.orders.map(i=>i.id))
+			// ids = ids.concat(data.goods.map(i=>i.id))
+			// ids = ids.concat(data.clients.map(i=>i.id))
+			// console.log(ids.length, [...new Set(ids)].length)
 		})
 	}
 }
-export default function (method, data){
-	return new methods()[method](data)
+export default async function (method, data){
+	return await new methods()[method](data)
 }

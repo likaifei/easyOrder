@@ -39,11 +39,11 @@
 				status: '未发货'
 			}
 		},
-		onShow(){
+		async onShow(){
 			let data = page.getCloseData()
 			if(data.type == 'client'){
 				this.client = data.data
-				this.priceBook = this.api('getPriceBook', this.client)
+				this.priceBook = await this.api('getPriceBook', this.client)
 				this.refreshPrice(true)
 				let time = new Date()
 				this.orderNumber = ((time.getMonth() + 1) / 100).toFixed(2).substr(2) + (time.getDate() / 100).toFixed(2).substr(2) + ' ' + this.client.clientName
@@ -58,7 +58,7 @@
 				this.client = order.client
 				this.orderNumber = order.orderNumber
 				this.status = order.status
-				this.priceBook = this.api('getPriceBook', this.client)
+				this.priceBook = await this.api('getPriceBook', this.client)
 			}
 		},
 		computed: {
@@ -98,11 +98,11 @@
 					item.money = (item.price * item.number).toFixed(2)
 				}
 			},
-			save(after){
+			async save(after){
 				let {orderNumber, goods, client, status, id} = this
 				if(this.goods.length == 0) return toast('商品列表为空')
 				if(!this.client.id) return toast('请选择客户')
-				this.api('saveOrder', {orderNumber, goods, client, status, id})
+				await this.api('saveOrder', {orderNumber, goods, client, status, id})
 				if(after == 'print'){
 					uni.$emit('print', {orderNumber, goods, client, status, id})
 				}

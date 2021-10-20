@@ -36,10 +36,10 @@
 			close(){
 				this.$refs.popup.close()
 			},
-			save(){
+			async save(){
 				if(this.item.name == '') return toast('商品名称不能为空')
 				let method = this.item.id?'updateGoods':'addGoods'
-				this.api(method, this.item)
+				await this.api(method, this.item)
 				this.close()
 				this.$emit('change')
 			}

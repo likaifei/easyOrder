@@ -36,10 +36,10 @@
 			close(){
 				this.$refs.popup.close()
 			},
-			save(){
+			async save(){
 				if(this.item.clientName == '') return toast('客户名不能为空')
 				let method = this.item.id?'updateClient':'addClient'
-				this.api(method, this.item)
+				await this.api(method, this.item)
 				this.close()
 				this.$emit('change')
 			}

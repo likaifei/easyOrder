@@ -33,8 +33,8 @@
 			this.refresh()
 		},
 		methods: {
-			refresh(){
-				this.clients = this.api('getClients')
+			async refresh(){
+				this.clients = await this.api('getClients')
 			},
 			open(item){
 				this.$refs.editClient.open(item)

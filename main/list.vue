@@ -1,8 +1,8 @@
 <template lang="pug">
 	.p15
-		input(placeholder="搜索(只保留最近1000条订单)" v-model="search")
+		input(placeholder="搜索" v-model="search" @confirm="getData(1)")
 		.mt15
-			.flex.between.item(v-for="(item, index) in filted" :key="index"
+			.flex.between.item(v-for="(item, index) in orders" :key="index"
 			:class="item.status=='已发货'?'opacity':''")
 				view.flex
 					view.blue(@tap="changeStatus(item)") {{item.status?item.status:'?'}}
@@ -17,33 +17,57 @@
 		data(){
 			return {
 				orders: [],
-				search: ''
+				search: '',
+				page: 1,
+				finished: false
 			}
 		},
 		onShow(){
-			this.refresh()
-		},
-		computed: {
-			filted(){
-				return this.orders.filter(i=>!i.orderNumber || i.orderNumber.indexOf(this.search) != -1)
-			}
+			this.getData(1)
 		},
 		methods: {
-			refresh(){
-				this.orders = []
-				this.orders = this.api('getOrders').reverse().sort((a, b) => a.status < b.status)
+			async getData(pg){
+				if(pg){
+					this.page = pg
+				}
+				if(pg == 1){
+					this.orders = []
+					this.finished = false
+				}
+				if(this.finished) return;
+				let result = await this.api('getOrders', {search: this.search, page: this.page})
+				this.orders = this.orders.concat(result.data)
+				if(!result.next_page_url)
+					this.finished = true;
+				this.page ++
 			},
-			changeStatus(item){
+			async changeStatus(item){
 				item.status = item.status == '未发货'? '已发货': '未发货'
-				this.api('saveOrder', item)
+				await this.api('saveOrder', item)
 			},
 			view(item){
 				this.openPage('/main/order', item)
 			},
 			print(item){
 				uni.$emit('print', item)
+			},
+			
+			handlePullRefresh(){
+				setTimeout(function () {
+					uni.stopPullDownRefresh();
+				}, 1000);
+				this.getData(1);
+			},
+			handleReachBottom(){
+				this.getData();
 			}
-		}
+		},
+		onPullDownRefresh(){
+			this.handlePullRefresh()
+		},
+		onReachBottom(){
+			this.handleReachBottom()
+		},
 	}
 </script>
 
