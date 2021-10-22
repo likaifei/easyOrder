@@ -92,7 +92,7 @@
 				//ESC! 是调字号  0的编码是48位最大 还可以是0,16,32,48
 				let header = db.get('header')
 				let footer = db.get('footer')
-				let vip = db.get('vip')
+				let vip = db.get('vip', '')
 				let str = ESC+'@'+C1+'!'+ch12+ header +C1+'!' + String.fromCharCode(0) + '\n'
 				str += line
 				str += '   名称        单价  个数  总价\n'
@@ -117,8 +117,8 @@
 				let space4 = new Array(len4).fill(' ').join('')
 				str += line
 				str += `   ${space4}合计: ${total} 元\n`
-				if(!vip) str += footer
-				str += '软件开发:15637245500,15515141039\n'
+				str += footer
+				if(!vip) str += '软件开发:15637245500,15515141039\n'
 				str += '\n\n\n\n'
 				let hex = str2hex(str)
 				bl.send(this.deviceId, hex)

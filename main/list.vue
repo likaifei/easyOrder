@@ -43,7 +43,7 @@
 			},
 			async changeStatus(item){
 				item.status = item.status == '未发货'? '已发货': '未发货'
-				await this.api('saveOrder', item)
+				await this.api('setOrderStatus', item)
 			},
 			view(item){
 				this.openPage('/main/order', item)
