@@ -55,14 +55,14 @@
 			},
 			{
 				"pagePath": "main/list",
-				"iconPath": "static/image/jcico/ic_report_normal.png",
-				"selectedIconPath": "static/image/jcico/ic_report_press.png",
+				"iconPath": "static/image/new/app_normal.png",
+				"selectedIconPath": "static/image/new/app_press.png",
 				"text": "订单"
 			},
 			{
 				"pagePath": "main/setting",
-				"iconPath": "static/image/new/app_normal.png",
-				"selectedIconPath": "static/image/new/app_press.png",
+				"iconPath": "static/image/new/my_normal.png",
+				"selectedIconPath": "static/image/new/my_press.png",
 				"text": "设置"
 			}
 		]
