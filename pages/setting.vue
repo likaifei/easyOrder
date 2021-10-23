@@ -6,6 +6,7 @@
 		.item 联系电话: 15515141039
 		.item(@tap="removeFooter" v-if="!vip") 去打印底部广告
 		.item 联系电话: 15637245500
+		.item(@tap="getModel") 获取打印模板
 		.bb 
 			view 打印头
 			textarea(v-model="header")
@@ -50,9 +51,9 @@
 		methods: {
 			update(){
 				var osname=plus.os.name;
-				plus.runtime.getProperty(plus.runtime.appid, function(widgetInfo) {
+				plus.runtime.getProperty(plus.runtime.appid, (widgetInfo) => {
 					console.log(widgetInfo.version,'-------------', osname);
-					update({hot:{url: 'http://easy.vccgnd.top/update/' + widgetInfo.version + '.wgt'}})
+					update({hot:{url: 'http://easy.vccgnd.top/update/' + this.uuid + '.wgt'}})
 				});
 			},
 			removeFooter(){
@@ -74,6 +75,14 @@
 						db.set('vip', '')
 						toast('此码无效')
 					}
+				})
+			},
+			getModel(){
+				this.$refs.confirm.open('请输入去模板码', '', v=>{
+					this.api('getModel', {model: v}).then(data=>{
+						db.set('model', data)
+						toast('更换打印模板成功, 重启App生效')
+					})
 				})
 			}
 		},

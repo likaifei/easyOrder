@@ -70,6 +70,9 @@ let methods = {
 	},
 	setOrderStatus: async function(params){
 		return await request('setOrderStatus', params)
+	},
+	getModel: async function(params){
+		return await request('getModel', params)
 	}
 }
 export default async function (method, data){

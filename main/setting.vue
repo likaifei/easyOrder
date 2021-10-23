@@ -23,12 +23,14 @@
 				deviceId: '',
 				scanning: false,
 				lastPrinter: '',
-				recoverList: []
+				recoverList: [],
+				custom: ''
 			}
 		},
 		onLoad(){
 			uni.$on('print', this.print)
 			this.lastPrinter = db.get('lastPrinter')
+			this.custom = db.get('model', '')
 			bl.open()
 			bl.onScan(this.onScan)
 			this.scan()
@@ -58,32 +60,20 @@
 				this.scanning = false
 			},
 			print(data){
-				let maxLen = 25 // 比如这张纸最多放25个字符
-				function getLen(text){
-					let map = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,+*!"\'0123456789$'
-					let result = 0
-					for(let i = 0; i < text.length; i++){
-						if(map.indexOf(text.substr(i, 1)) == -1){
-							result += 2
-						}else{
-							result += 1
-						}
+				if(this.custom){
+					try{
+						let result = new Function('vm,db,data', this.custom)(this,db,data)
+						console.log(result)
+						let hex = str2hex(result)
+						bl.send(this.deviceId, hex)
+						return;
+					}catch(e){
+						console.log(e)
 					}
-					return result
 				}
-				function calcSpace(text1, text2, len){
-					text1 = text1.toString()
-					text2 = text2.toString()
-					if(!len)
-						len = maxLen
-					
-					let len1 = getLen(text1)
-					let len2 = getLen(text2)
-					console.log(len, len1, len2)
-					let result = len - len1 - len2
-					if(result < 1) result = 1
-					return result
-				}
+				let maxLen = 25 // 比如这张纸最多放25个字符
+				let getLen = this.getLen
+				let calcSpace = this.calcSpace
 				if(!this.connected) return toast('请先链接打印机')
 				let ESC = String.fromCharCode(27)
 				let C1 = String.fromCharCode(0x1c)
@@ -141,6 +131,30 @@
 				if(this.deviceId != deviceId) return;
 				this.connected = connected
 			},
+			getLen(text){
+				let map = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,+*!"\'0123456789$'
+				let result = 0
+				for(let i = 0; i < text.length; i++){
+					if(map.indexOf(text.substr(i, 1)) == -1){
+						result += 2
+					}else{
+						result += 1
+					}
+				}
+				return result
+			},
+			calcSpace(text1, text2, len, maxLen = 25){
+				text1 = text1.toString()
+				text2 = text2.toString()
+				if(!len)
+					len = maxLen
+				let len1 = this.getLen(text1)
+				let len2 = this.getLen(text2)
+				console.log(len, len1, len2)
+				let result = len - len1 - len2
+				if(result < 1) result = 1
+				return result
+			}
 		}
 	}
 </script>
