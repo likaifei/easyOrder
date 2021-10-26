@@ -5,8 +5,8 @@
 			view.grey-container.alcenter.mt10
 				input.ml10.tc.input(v-model="value" focus)
 			view.flex.around.mt10
-				view.btn.bggrey.black.bold.tc.h29.ft12(@tap="close") 取消
-				view.btn.bgblue.white.bold.tc.h29.ft12(@tap="confirm") 确定
+				view.btn.bggrey.black.bold.tc.h29.ft12(@tap="close") {{$t('取消')}}
+				view.btn.bgblue.white.bold.tc.h29.ft12(@tap="confirm") {{$t('确定')}}
 </template>
 
 <script>

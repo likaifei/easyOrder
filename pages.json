@@ -34,7 +34,7 @@
 		{
 			"path": "pages/goods",
 			"style": {
-				"navigationBarTitleText": "选商品"
+				"navigationBarTitleText": "商品"
 			}
 		}
 	],

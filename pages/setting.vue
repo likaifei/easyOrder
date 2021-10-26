@@ -2,15 +2,16 @@
 	.p15
 		confirm(ref="confirm")
 		.item uuid: {{uuid}}
-		.item(@tap="update") 更新
-		.item 联系电话: 15515141039
-		.item(@tap="removeFooter" v-if="!vip") 去打印底部广告
-		.item 联系电话: 15637245500
-		.item(@tap="getModel") 获取打印模板
+		.item(@tap="update") {{$t('更新')}}
+		.item {{$t('联系电话')}}: 15515141039
+		.item {{$t('联系电话')}}: 15637245500
+		.item {{$t('邮箱')}}: li0kaifei@126.com
+		.item(@tap="removeFooter" v-if="!vip") {{$t('去打印底部广告')}}
+		.item(@tap="getModel") {{$t('获取打印模板')}}
 		.bb 
-			view 打印头
+			view {{$t('打印头')}}
 			textarea(v-model="header")
-		.bb 打印尾
+		.bb {{$t('打印尾')}}
 			textarea(v-model="footer")
 </template>
 
@@ -35,7 +36,8 @@
 				uuid: '',
 				header: '',
 				footer: '',
-				vip: ''
+				vip: '',
+				title: '其他设置'
 			}
 		},
 		onLoad(){
@@ -57,31 +59,31 @@
 				});
 			},
 			removeFooter(){
-				this.$refs.confirm.open('请输入去广告码', '', v=>{
+				this.$refs.confirm.open(this.$t('请输入去广告码'), '', v=>{
 					let uuid = CryptoJS.enc.Utf8.parse(this.uuid.substr(4,8).padStart(8, '0'))
 					let cryptoText = CryptoJS.AES.encrypt('vip', uuid, aesOption).ciphertext.toString(CryptoJS.enc.Base64)
 					let data = CryptoJS.AES.decrypt(v, uuid, aesOption)
 					try{
 						data = CryptoJS.enc.Utf8.stringify(data)
-						if(data == '') return toast('此码无效')
+						if(data == '') return toast(this.$t('此码无效'))
 					}catch(e){
 						console.log(e.toString())
-						return toast('此码无效')
+						return toast(this.$t('此码无效'))
 					}
 					if(data == 'vip'){
 						db.set('vip', 1)
-						toast('去广告成功')
+						toast(this.$t('去广告成功'))
 					}else{
 						db.set('vip', '')
-						toast('此码无效')
+						toast(this.$t('此码无效'))
 					}
 				})
 			},
 			getModel(){
-				this.$refs.confirm.open('请输入去模板码', '', v=>{
+				this.$refs.confirm.open(this.$t('请输入模板码'), '', v=>{
 					this.api('getModel', {model: v}).then(data=>{
 						db.set('model', data)
-						toast('更换打印模板成功, 重启App生效')
+						toast(this.$t('更换打印模板成功，重启App生效'))
 					})
 				})
 			}

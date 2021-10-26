@@ -2,20 +2,20 @@
 	uniPopup(ref="popup")
 		.container
 			.flex.item.alcenter
-				.label 客户
+				.label {{$t('客户')}}
 				input(v-model="item.clientName")
 			.flex.item.alcenter
-				.label 地址
+				.label {{$t('地址')}}
 				input(v-model="item.clientAddr")
 			.flex.item.alcenter
-				.label 电话
+				.label {{$t('电话')}}
 				input(v-model="item.clientPhone")
 			.flex.item.alcenter
-				.label 备注
+				.label {{$t('备注')}}
 				input(v-model="item.note")
 			.flex.between.item.alcenter
 				view
-				view(@tap="save") 保存
+				view(@tap="save") {{$t('保存')}}
 </template>
 
 <script>
@@ -37,7 +37,7 @@
 				this.$refs.popup.close()
 			},
 			async save(){
-				if(this.item.clientName == '') return toast('客户名不能为空')
+				if(this.item.clientName == '') return toast(this.$t('客户名不能为空'))
 				let method = this.item.id?'updateClient':'addClient'
 				await this.api(method, this.item)
 				this.close()

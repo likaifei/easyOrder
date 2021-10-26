@@ -1,10 +1,13 @@
 <template lang="pug">
 	.p15
-		.item(@tap="go('/pages/setting')") 其他设置
+		.item.flex.around
+			.lang(@tap="changeLang('zh')" :class="$i18n.locale=='zh'?'active':''") 中文
+			.lang(@tap="changeLang('en')" :class="$i18n.locale=='en'?'active':''") English
+		.item(@tap="go('/pages/setting')") {{$t('其他设置')}}
 		.flex.between.mt20
-			view(@tap="scan" v-if="!scanning") 搜索蓝牙
-			view(v-else @tap="stopScan") 停止搜索
-			view(v-if="connected" @tap="disconnect") 断开
+			view(@tap="scan" v-if="!scanning") {{$t('搜索蓝牙')}}
+			view(v-else @tap="stopScan") {{$t('停止搜索')}}
+			view(v-if="connected" @tap="disconnect") {{$t('断开')}}
 		.flex.between.p15(v-for="item in devices" :key="item.deviceId" @tap="connect(item)" :class="item.deviceId==deviceId?'blue':''")
 			view {{item.deviceId}}
 			view {{item.name || item.localName}}
@@ -24,7 +27,8 @@
 				scanning: false,
 				lastPrinter: '',
 				recoverList: [],
-				custom: ''
+				custom: '',
+				title: '设置'
 			}
 		},
 		onLoad(){
@@ -36,6 +40,25 @@
 			this.scan()
 		},
 		methods: {
+			changeLang(v){
+				db.set('lang', v)
+				this.$i18n.locale = v
+				uni.setTabBarItem({
+				  index: 0,
+				  text: this.$t('开单'),
+				})
+				uni.setTabBarItem({
+				  index: 1,
+				  text: this.$t('订单'),
+				})
+				uni.setTabBarItem({
+				  index: 2,
+				  text: this.$t('设置'),
+				})
+				uni.reLaunch({
+					url: '/main/setting'
+				})
+			},
 			onScan(devices){
 				this.devices = this.devices.concat(devices.devices)
 				let oldDeviceId = this.lastPrinter
@@ -74,7 +97,7 @@
 				let maxLen = 25 // 比如这张纸最多放25个字符
 				let getLen = this.getLen
 				let calcSpace = this.calcSpace
-				if(!this.connected) return toast('请先链接打印机')
+				if(!this.connected) return toast($t('请先链接打印机'))
 				let ESC = String.fromCharCode(27)
 				let C1 = String.fromCharCode(0x1c)
 				let ch12 = String.fromCharCode(12)
@@ -112,7 +135,7 @@
 				str += '\n\n\n\n'
 				let hex = str2hex(str)
 				bl.send(this.deviceId, hex)
-				toast('打印指令发送完成')
+				toast($t('打印指令发送完成'))
 			},
 			connect(item){
 				this.stopScan()
@@ -164,5 +187,11 @@
 		line-height: 80upx;
 		height: 80upx;
 		border-bottom: 1px solid #ccc;
+	}
+	.active{
+		background: rgb(33, 150, 243);
+	}
+	.lang{
+		padding: 0 20upx;
 	}
 </style>

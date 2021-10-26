@@ -2,6 +2,11 @@ import {page} from '@/js/utils'
 import api from './apiOnline'
 
 export default {
+	onLoad(){
+		uni.setNavigationBarTitle({
+			title: this.$t(this.title)
+		});
+	},
 	methods: {
 		go(url){
 			if(url.indexOf('main') != -1)

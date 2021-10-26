@@ -2,20 +2,20 @@
 	uniPopup(ref="popup")
 		.container
 			.flex.item.alcenter
-				.label 商品名称
+				.label {{$t('商品名称')}}
 				input(v-model="item.name")
 			.flex.item.alcenter
-				.label 分组
+				.label {{$t('分组')}}
 				input(v-model="item.group")
 			.flex.item.alcenter
-				.label 默认价格
+				.label {{$t('默认价格')}}
 				input(v-model="item.price")
 			.flex.item.alcenter
-				.label 备注
+				.label {{$t('备注')}}
 				input(v-model="item.note")
 			.flex.between.item.alcenter
 				view
-				view(@tap="save") 保存
+				view(@tap="save") {{$t('保存')}}
 </template>
 
 <script>
@@ -37,7 +37,7 @@
 				this.$refs.popup.close()
 			},
 			async save(){
-				if(this.item.name == '') return toast('商品名称不能为空')
+				if(this.item.name == '') return toast(this.$t('商品名称不能为空'))
 				let method = this.item.id?'updateGoods':'addGoods'
 				await this.api(method, this.item)
 				this.close()

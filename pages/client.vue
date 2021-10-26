@@ -2,8 +2,8 @@
 	view.p15
 		editClient(ref="editClient" @change="refresh")
 		.flex.between
-			input(placeholder="搜索" v-model="search")
-			view(@tap="add") 添加
+			input(:placeholder="$t('搜索')" v-model="search")
+			view(@tap="add") {{$t('添加')}}
 		.mt15
 			.flex.between.item(v-for="item in filted" :key="item.id"
 				@longpress="open(item)" @tap="select(item)")
@@ -19,7 +19,8 @@
 		data(){
 			return {
 				clients: [],
-				search: ''
+				search: '',
+				title: '客户'
 			}
 		},
 		computed: {

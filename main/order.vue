@@ -1,10 +1,10 @@
 <template lang="pug">
 	.p15
 		confirm(ref="confirm")
-		view.tc {{orderNumber}}({{status}})
+		view.tc {{orderNumber}}({{$t(status)}})
 		.flex.between
-			view(@tap="openClient") {{client.id?client.clientName:'选客户'}}
-			view(@tap="openGoods") 选商品
+			view(@tap="openClient") {{client.id?client.clientName:$t('选客户')}}
+			view(@tap="openGoods") {{$t('选商品')}}
 		view.mt15
 			view.item(v-for="item in goods" :key="item.id" @tap="openItem(item)")
 				.flex.between
@@ -16,12 +16,12 @@
 		view.bottom
 		view.fix-bottom.flex.between.alcenter
 			view.flex.column.ml15
-				view 共 {{count}} 种商品
-				view ¥{{total}}
+				view {{$t('共')}} {{count}} {{$t('种商品')}}
+				view {{$t('¥')}}{{total}}
 			view.flex
-				view.confirm-btn2.white.tc(@tap="clear") 清空
-				view.confirm-btn1.white.tc(@tap="save('print')") 保存并打印
-				view.confirm-btn.white.tc(@tap="save") 保存
+				view.confirm-btn2.white.tc(@tap="clear") {{$t('清空')}}
+				view.confirm-btn1.white.tc(@tap="save('print')") {{$t('保存并打印')}}
+				view.confirm-btn.white.tc(@tap="save") {{$t('保存')}}
 </template>
 
 <script>
@@ -36,7 +36,8 @@
 				client: {},
 				priceBook: {},
 				orderNumber: '',
-				status: '未发货'
+				status: '未发货',
+				title: '开单'
 			}
 		},
 		async onShow(){
@@ -71,14 +72,28 @@
 				}, 0).toFixed(2)
 			}
 		},
+		onLoad(){
+			uni.setTabBarItem({
+			  index: 0,
+			  text: this.$t('开单'),
+			})
+			uni.setTabBarItem({
+			  index: 1,
+			  text: this.$t('订单'),
+			})
+			uni.setTabBarItem({
+			  index: 2,
+			  text: this.$t('设置'),
+			})
+		},
 		methods: {
 			openItem(item){
 				this.currentItem = item
-				this.$refs.confirm.open('请输入单价', item.price, this.changePrice)
+				this.$refs.confirm.open(this.$t('请输入单价'), item.price, this.changePrice)
 			},
 			changePrice(v){
 				if(Number(v) != v)
-					return toast('请输入有效的数字')
+					return toast(this.$t('请输入有效的数字'))
 				this.currentItem.price = Number(v)
 				this.currentItem.money = (this.currentItem.price * this.currentItem.number).toFixed(2)
 			},
@@ -100,8 +115,8 @@
 			},
 			async save(after){
 				let {orderNumber, goods, client, status, id} = this
-				if(this.goods.length == 0) return toast('商品列表为空')
-				if(!this.client.id) return toast('请选择客户')
+				if(this.goods.length == 0) return toast(this.$t('商品列表为空'))
+				if(!this.client.id) return toast(this.$t('请选择客户'))
 				await this.api('saveOrder', {orderNumber, goods, client, status, id})
 				if(after == 'print'){
 					uni.$emit('print', {orderNumber, goods, client, status, id})

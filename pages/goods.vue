@@ -3,8 +3,8 @@
 		editGoods(ref="editGoods" @change="refreshList")
 		confirm(ref="confirm")
 		.flex.between
-			input(placeholder="搜索" v-model="search")
-			view(@tap="addGoods") 添加
+			input(:placeholder="$t('搜索')" v-model="search")
+			view(@tap="addGoods") {{$t('添加')}}
 		.flex.wrap.mt10
 			.tag(v-for="item in groups" :key="item" 
 			:class="group==item?'active':''" @tap="changeGroup(item)") {{item}}
@@ -14,7 +14,7 @@
 				view ¥{{item.price}}
 			.flex.between
 				view {{item.group}}
-				view.empty-btn.plr10.black(@tap="add(item)" v-if="!selected[item.id]") 选中
+				view.empty-btn.plr10.black(@tap="add(item)" v-if="!selected[item.id]") {{$t('选中')}}
 				view.flex.alcenter(v-else)
 					view.number-btn.flex.between
 						view.number-dec.alcenter.jscenter.flex(@tap="dec(selected[item.id])")
@@ -25,8 +25,8 @@
 							view.inc2
 		view.bottom
 		view.fix-bottom.flex.between
-			view.ml15 共 {{selectedCount}} 种商品
-			view.confirm-btn.white.tc(@tap="save") 确定
+			view.ml15 {{$t('共')}} {{selectedCount}} {{$t('种商品')}}
+			view.confirm-btn.white.tc(@tap="save") {{$t('确定')}}
 </template>
 
 <script>
@@ -44,7 +44,8 @@
 				search: '',
 				groups: [],
 				group: '',
-				clientPrice: ''
+				clientPrice: '',
+				title: '商品'
 			}
 		},
 		onLoad(){
@@ -65,19 +66,19 @@
 			},
 			filtedGoods(){
 				let group = this.group
-				if(group == '仅选中')
+				if(group == this.$t('仅选中'))
 					return Object.values(this.selected)
 				let search = this.search.trim()
 				if(search.trim() == ''){
 					if(group == '')
 						return this.goods;
-					if(group == '未分类')
+					if(group == this.$t('未分类'))
 						group = ''
 					return this.goods.filter(i=>i.group == group)
 				}
 				if(group == '')
 					return this.goods.filter(i => i.name.indexOf(search) != -1);
-				if(group == '未分类')
+				if(group == this.$t('未分类'))
 					group = ''
 				return this.goods.filter(i => i.name.indexOf(search) != -1 && i.group == group);
 			}
@@ -86,8 +87,8 @@
 			async refreshList(){
 				this.goods = await this.api('getGoods')
 				this.groups = Array.from(new Set(this.goods.map(i=>i.group))).filter(i=>i!='')
-				this.groups.push('未分类')
-				this.groups.push('仅选中')
+				this.groups.push(this.$t('未分类'))
+				this.groups.push(this.$t('仅选中'))
 			},
 			changeGroup(group){
 				this.group = this.group == group?'':group
@@ -106,7 +107,7 @@
 			},
 			popup(item){
 				this.currentItem = item
-				this.$refs.confirm.open('请输入数量', item.number, this.changeNumber)
+				this.$refs.confirm.open(this.$t('请输入数量'), item.number, this.changeNumber)
 			},
 			inc(item){
 				item.number ++
@@ -128,7 +129,7 @@
 			},
 			changeNumber(v){
 				if(Number(v) != v)
-					return toast('请输入有效的数字')
+					return toast(this.$t('请输入有效的数字'))
 				this.currentItem.number = Number(v)
 				this.refresh()
 			},

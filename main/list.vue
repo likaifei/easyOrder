@@ -1,15 +1,15 @@
 <template lang="pug">
 	.p15
-		input(placeholder="搜索" v-model="search" @confirm="getData(1)")
+		input(:placeholder="$t('搜索')" v-model="search" @confirm="getData(1)")
 		.mt15
 			.flex.between.item(v-for="(item, index) in orders" :key="index"
 			:class="item.status=='已发货'?'opacity':''")
 				view.flex
-					view.blue(@tap="changeStatus(item)") {{item.status?item.status:'?'}}
+					view.blue(@tap="changeStatus(item)") {{item.status?$t(item.status):'?'}}
 					view.ml15 {{item.orderNumber}}
 				.flex.blue
-					view(@tap="print(item)") 打印
-					view.ml15(@tap="view(item)") 查看
+					view(@tap="print(item)") {{$t('打印')}}
+					view.ml15(@tap="view(item)") {{$t('查看')}}
 </template>
 
 <script>
@@ -19,7 +19,8 @@
 				orders: [],
 				search: '',
 				page: 1,
-				finished: false
+				finished: false,
+				title: '订单'
 			}
 		},
 		onShow(){

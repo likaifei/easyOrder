@@ -13,7 +13,7 @@ function request(url, data = {}, showLoading = false){
 	}
 	if(showLoading)
 		uni.showLoading({
-			title: '加载中',
+			title: 'Loading',
 			mask: true
 		});
 	return new Promise((resolve, reject) => {

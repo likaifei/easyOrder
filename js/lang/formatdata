@@ -1,0 +1,6 @@
+sed -e "s/,/\",\"/" \
+-e "s/^/[\"/" \
+-e "s/$/\"],/" \
+-e "1i\module.exports = [" \
+-e "$ a\]" \
+data.csv > formated.js
