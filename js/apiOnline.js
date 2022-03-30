@@ -1,10 +1,14 @@
-import {db, toast} from './utils'
+import {db, toast, uuid} from './utils'
 const CryptoJS = require('crypto-js')
 const iv = CryptoJS.enc.Hex.parse('DEAD1151DEAD')
 const aesOption = {iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7}
 function request(url, data = {}, showLoading = false){
 	let method = 'POST'
 	data.uid = db.get('uuid')
+	if(data.uuid == ''){
+		db.set('uuid', uuid())
+		data.uid = db.get('uuid', '')
+	}
 	let host = 'http://easy.vccgnd.top/api/public/index.php'
 	let fullUrl = host+'/api/'+url
 	let header = {}

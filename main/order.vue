@@ -105,13 +105,18 @@
 			},
 			refreshPrice(focus = false){
 				let book = this.priceBook
-				for(let item of this.goods){
-					if(!focus && item.money !== undefined) continue;
+				let goods = this.goods
+				for(let item of goods){
+					if(!focus && item.money !== undefined){
+						item.money = (item.price * item.number).toFixed(2)
+						continue;
+					}
 					if(book[item.id]){
 						item.price = book[item.id]
 					}
 					item.money = (item.price * item.number).toFixed(2)
 				}
+				this.goods = goods
 			},
 			async save(after){
 				let {orderNumber, goods, client, status, id} = this
